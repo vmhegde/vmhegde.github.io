@@ -1,0 +1,12 @@
+[
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/classification/classification.html",
+      "/posts/clustering/clustering-checkpoint.html",
+      "/posts/outlierdetection/outlier_detection-checkpoint.html",
+      "/posts/probabilitytheory/probability_theory-checkpoint.html",
+      "/posts/regression/regression-checkpoint.html"
+    ]
+  }
+]

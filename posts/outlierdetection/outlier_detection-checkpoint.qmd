@@ -1,0 +1,132 @@
+---
+title: Outlier Detection on Annual Rainfall in Coastal Karnataka
+jupyter: python3
+---
+
+We use the Shapiro-Wilk test and Isolation Forest to detect outliers in the rainfall data.
+
+```{python}
+#| tags: []
+import sys
+
+assert sys.version_info >= (3, 7)
+```
+
+```{python}
+#| tags: []
+from packaging import version
+import sklearn
+
+assert version.parse(sklearn.__version__) >= version.parse("1.0.1")
+```
+
+```{python}
+#| tags: []
+import pandas as pd
+
+df = pd.read_csv("./coastal_karnataka_rainfall-checkpoint.csv")
+
+df.keys()
+```
+
+## Plotting the earthquake data correlating earthquake depth to earthquake magnitude
+
+```{python}
+#| tags: []
+import matplotlib.pyplot as plt
+
+plt.rc('font', size=14)
+plt.rc('axes', labelsize=14, titlesize=14)
+plt.rc('legend', fontsize=14)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
+plt.figure(figsize=(10, 4))
+
+X = df['YEAR']
+X.drop(columns=['YEAR'])
+y = df['ANNUAL']
+plt.scatter(X, y, marker='*')
+plt.xlabel("$year$")
+plt.ylabel("$rainfall$", rotation=90)
+#plt.axis([90, 160, 60, 75])
+plt.grid()
+plt.show()
+```
+
+## Detecting Outliers by Normalizing the Data
+
+The Shapiro-Wilk test can be used to check if data is normally distributed. If the data is normally distributed, we can use the mean and standard deviation to detect outliers.
+
+```{python}
+#| tags: []
+import scipy
+import numpy as np
+arr = df.ANNUAL.to_numpy()
+arr = arr[~np.isnan(arr)]
+scipy.stats.shapiro(arr)
+# small p-value --> data is normal
+```
+
+Because the p-value is very small, we can deduce that the data is normally distributed. Thus, we can say that outliers lie 3.5 standard deviations above and below the mean of the distribution.
+
+## Plotting the Kernel Denstiy Estimation
+
+The Kernel Density Estimation of the data helps us visualize the shape of the data in a smooth curve.
+
+```{python}
+#| tags: []
+plt = df.ANNUAL.plot.kde()
+mean = df.ANNUAL.mean()
+std = df.ANNUAL.std()
+
+# marking outliers
+plt.vlines(x = std*3.5 + mean, ymin = -0.00005, ymax = 0.0008,
+           colors = 'orange',
+           label = 'vline_multiple - full height')
+plt.vlines(x = mean - std*3.5, ymin = -0.00005, ymax = 0.0008,
+           colors = 'orange',
+           label = 'vline_multiple - full height')
+```
+
+## Detecting Outliers using Isolation Forest
+
+The Isolation Forest algorithm isolates anomalies by randomly selecting a feature and then randomly selecting a split value between the maximum and minimum values of the selected feature. Outliers are expected to have shorter paths in the tree structure, making them easier to isolate
+
+```{python}
+#| tags: []
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+import matplotlib.pyplot as plt
+
+# If the dataset has multiple columns for different years, use the following lines to reshape it
+# df_melted = df.melt(id_vars=['SomeIDColumn'], var_name='Year', value_name='Rainfall')
+# df_melted = df_melted.dropna()  # Remove any NaN values
+# column_to_use = 'Rainfall'  # This is the column with rainfall data
+
+df = df.dropna(subset=['ANNUAL'])
+
+# If there's a single column for rainfall, directly use it
+column_to_use = 'ANNUAL'  # Replace with your actual column name
+
+# Creating an instance of Isolation Forest
+iso_forest = IsolationForest(n_estimators=100, contamination='auto', random_state=42)
+
+# Fitting the model on the Rainfall column
+iso_forest.fit(df[[column_to_use]])
+
+# Predicting outliers
+outliers = iso_forest.predict(df[[column_to_use]])
+
+# Adding a column to the DataFrame to indicate outliers
+df['outlier'] = outliers
+
+# Plotting the results
+plt.figure(figsize=(10, 6))
+plt.scatter(df['YEAR'], df[column_to_use], c=df['outlier'], cmap='coolwarm')  # Replace 'Year' if needed
+plt.title('Outlier Detection in Annual Rainfall')
+plt.xlabel('Year')
+plt.ylabel('Rainfall')
+plt.show()
+```
+
+The points marked in blue are outliers according to the Isolation Forest. The blue points help us visualize years with unusual rainfall patterns. This could be due to extreme weather events such as droughts or floods.
