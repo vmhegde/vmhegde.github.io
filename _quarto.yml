@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "CS 5805 Blog Posts"
+  navbar:
+    right:
+      - text: Blog
+        href: blog.qmd 
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+
+editor: visual
+

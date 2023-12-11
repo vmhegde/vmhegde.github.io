@@ -1,0 +1,7 @@
+---
+title: "CS 5805 Blogs - Veda Hegde"
+about:
+  template: jolla
+---
+
+All blogs can be found by clicking 'Blog'
