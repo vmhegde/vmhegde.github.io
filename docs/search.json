@@ -1,0 +1,240 @@
+[
+  {
+    "objectID": "posts/regression/regression-checkpoint.html",
+    "href": "posts/regression/regression-checkpoint.html",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "",
+    "text": "Dataset - Height and Weight data for 18 year olds\nPlot original data on scatterplot\nSplit data into training and test sets\nUse regression to see if the data is linear\nGet coefficients of linear equation and r-value\n\nlow r-value – linear regression is not the best fit for the data\nimport sys\n\nassert sys.version_info &gt;= (3, 7)\nfrom packaging import version\nimport sklearn\n\nassert version.parse(sklearn.__version__) &gt;= version.parse(\"1.0.1\")\nimport pandas as pd\n\ndf = pd.read_csv(\"./SOCR-HeightWeight-checkpoint.csv\")\n\n#df['Weight(Pounds)']\ndf['Height(Inches)']\n\n0        65.78331\n1        71.51521\n2        69.39874\n3        68.21660\n4        67.78781\n           ...   \n24995    69.50215\n24996    64.54826\n24997    64.69855\n24998    67.52918\n24999    68.87761\nName: Height(Inches), Length: 25000, dtype: float64\nimport numpy as np"
+  },
+  {
+    "objectID": "posts/regression/regression-checkpoint.html#plot-original-data-on-scatterplot",
+    "href": "posts/regression/regression-checkpoint.html#plot-original-data-on-scatterplot",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "Plot original data on scatterplot",
+    "text": "Plot original data on scatterplot\n\nimport matplotlib.pyplot as plt\n\nplt.rc('font', size=14)\nplt.rc('axes', labelsize=14, titlesize=14)\nplt.rc('legend', fontsize=14)\nplt.rc('xtick', labelsize=10)\nplt.rc('ytick', labelsize=10)\nplt.figure(figsize=(10, 4))\n\nX = df['Weight(Pounds)'][0:200]\ny = df['Height(Inches)'][0:200]\nplt.scatter(X, y, marker='*')\nplt.xlabel(\"$weight$\")\nplt.ylabel(\"$height$\", rotation=90)\nplt.axis([90, 160, 60, 75])\nplt.grid()\nplt.show()"
+  },
+  {
+    "objectID": "posts/regression/regression-checkpoint.html#split-data-into-testing-and-training-sets",
+    "href": "posts/regression/regression-checkpoint.html#split-data-into-testing-and-training-sets",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "Split data into testing and training sets",
+    "text": "Split data into testing and training sets\n\nfrom sklearn import datasets, linear_model\nfrom sklearn.metrics import mean_squared_error, r2_score\n\n# Split the data into training/testing sets\nX_train = X[:-100]\nX_test = X[100:]\n\n# Split the targets into training/testing sets\ny_train = y[:-100]\ny_test = y[100:]"
+  },
+  {
+    "objectID": "posts/regression/regression-checkpoint.html#fit-the-data-to-a-linear-regression",
+    "href": "posts/regression/regression-checkpoint.html#fit-the-data-to-a-linear-regression",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "Fit the data to a linear regression",
+    "text": "Fit the data to a linear regression\n\n# Create linear regression object\nregr = linear_model.LinearRegression()\n\n# Train the model using the training sets\nX_train=np.array(X_train).reshape(-1, 1) # reshaping to 2D array\n#y_train=np.array(y_train).reshape(-1, 1) # reshaping to 2D array\nregr.fit(X_train, y_train)\n\nLinearRegression()\n\n\n\n# Make predictions using the testing set\nX_test=np.array(X_test).reshape(-1, 1) # reshaping to 2D array\ny_pred = regr.predict(X_test)"
+  },
+  {
+    "objectID": "posts/regression/regression-checkpoint.html#get-coefficients-of-linear-equation",
+    "href": "posts/regression/regression-checkpoint.html#get-coefficients-of-linear-equation",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "Get coefficients of linear-equation",
+    "text": "Get coefficients of linear-equation\n\n# The coefficients\nprint(\"Coefficients: \\n\", regr.coef_)\nprint(\"y-intercept: \\n\", regr.intercept_)\n# The mean squared error\nprint(\"Mean squared error: %.2f\" % mean_squared_error(y_test, y_pred))\n# The coefficient of determination: 1 is perfect prediction\nprint(\"Coefficient of determination: %.2f\" % r2_score(y_test, y_pred))\n\nCoefficients: \n [0.07991179]\ny-intercept: \n 57.8157253513461\nMean squared error: 2.83\nCoefficient of determination: 0.31\n\n\nThe low r-value tells us that a linear regression is not the best fit for this data. We know that this model will not make very accurate predictions.\n\n# Plot outputs\nimport matplotlib.pyplot as plt\n\nplt.rc('font', size=14)\nplt.rc('axes', labelsize=14, titlesize=14)\nplt.rc('legend', fontsize=14)\nplt.rc('xtick', labelsize=10)\nplt.rc('ytick', labelsize=10)\nplt.figure(figsize=(10, 4))\n\nplt.xlabel(\"$weight$\")\nplt.ylabel(\"$height$\", rotation=90)\nplt.axis([90, 160, 60, 75])\n\nplt.scatter(X_test, y_test, marker='*')\nplt.plot(X_test, y_pred, color=\"black\", linewidth=2)\n\nplt.grid()\nplt.show()"
+  },
+  {
+    "objectID": "posts/regression/regression-checkpoint.html#trying-other-regressions-to-find-a-better-fit",
+    "href": "posts/regression/regression-checkpoint.html#trying-other-regressions-to-find-a-better-fit",
+    "title": "Linear Regression on Height and Weight data for 18 year olds",
+    "section": "Trying other regressions to find a better fit",
+    "text": "Trying other regressions to find a better fit\n\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.linear_model import LinearRegression, Ridge, Lasso\nfrom sklearn.metrics import mean_squared_error, r2_score\nfrom sklearn.preprocessing import PolynomialFeatures\nfrom sklearn.pipeline import make_pipeline\n\n# Fit a polynomial regression model\ndegree = 2  # You can try different degrees\npoly_reg = make_pipeline(PolynomialFeatures(degree), LinearRegression())\npoly_reg.fit(X_train, y_train)\n\n# Fit a Ridge regression model\nridge_reg = Ridge(alpha=1.0)  # Alpha is a hyperparameter that you can tune\nridge_reg.fit(X_train, y_train)\n\n# Fit a Lasso regression model\nlasso_reg = Lasso(alpha=0.1)  # Alpha is a hyperparameter that you can tune\nlasso_reg.fit(X_train, y_train)\n\n# Evaluate the models using test data\nmodels = {'Polynomial': poly_reg, 'Ridge': ridge_reg, 'Lasso': lasso_reg}\nfor name, model in models.items():\n    y_pred = model.predict(X_test)\n    mse = mean_squared_error(y_test, y_pred)\n    r2 = r2_score(y_test, y_pred)\n    print(f'{name} Regression - MSE: {mse:.2f}, R²: {r2:.2f}')\n\nPolynomial Regression - MSE: 2.82, R²: 0.31\nRidge Regression - MSE: 2.83, R²: 0.31\nLasso Regression - MSE: 2.83, R²: 0.31\n\n\nAll three models show very similar performance in terms of both MSE and R². The Ridge and Lasso’s similar performance to polynomial regression could imply that higher-order terms do not significantly improve the model, or the chosen degree for the polynomial model was not high enough to capture more complex relationships."
+  },
+  {
+    "objectID": "posts/outlierdetection/outlier_detection-checkpoint.html",
+    "href": "posts/outlierdetection/outlier_detection-checkpoint.html",
+    "title": "Outlier Detection on Annual Rainfall in Coastal Karnataka",
+    "section": "",
+    "text": "We use the Shapiro-Wilk test and Isolation Forest to detect outliers in the rainfall data.\nimport sys\n\nassert sys.version_info &gt;= (3, 7)\nfrom packaging import version\nimport sklearn\n\nassert version.parse(sklearn.__version__) &gt;= version.parse(\"1.0.1\")\nimport pandas as pd\n\ndf = pd.read_csv(\"./coastal_karnataka_rainfall-checkpoint.csv\")\n\ndf.keys()\n\nIndex(['SUBDIVISION', 'YEAR', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',\n       'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'ANNUAL', 'Jan-Feb', 'Mar-May',\n       'Jun-Sep', 'Oct-Dec'],\n      dtype='object')"
+  },
+  {
+    "objectID": "posts/outlierdetection/outlier_detection-checkpoint.html#plotting-the-earthquake-data-correlating-earthquake-depth-to-earthquake-magnitude",
+    "href": "posts/outlierdetection/outlier_detection-checkpoint.html#plotting-the-earthquake-data-correlating-earthquake-depth-to-earthquake-magnitude",
+    "title": "Outlier Detection on Annual Rainfall in Coastal Karnataka",
+    "section": "Plotting the earthquake data correlating earthquake depth to earthquake magnitude",
+    "text": "Plotting the earthquake data correlating earthquake depth to earthquake magnitude\n\nimport matplotlib.pyplot as plt\n\nplt.rc('font', size=14)\nplt.rc('axes', labelsize=14, titlesize=14)\nplt.rc('legend', fontsize=14)\nplt.rc('xtick', labelsize=10)\nplt.rc('ytick', labelsize=10)\nplt.figure(figsize=(10, 4))\n\nX = df['YEAR']\nX.drop(columns=['YEAR'])\ny = df['ANNUAL']\nplt.scatter(X, y, marker='*')\nplt.xlabel(\"$year$\")\nplt.ylabel(\"$rainfall$\", rotation=90)\n#plt.axis([90, 160, 60, 75])\nplt.grid()\nplt.show()"
+  },
+  {
+    "objectID": "posts/outlierdetection/outlier_detection-checkpoint.html#detecting-outliers-by-normalizing-the-data",
+    "href": "posts/outlierdetection/outlier_detection-checkpoint.html#detecting-outliers-by-normalizing-the-data",
+    "title": "Outlier Detection on Annual Rainfall in Coastal Karnataka",
+    "section": "Detecting Outliers by Normalizing the Data",
+    "text": "Detecting Outliers by Normalizing the Data\nThe Shapiro-Wilk test can be used to check if data is normally distributed. If the data is normally distributed, we can use the mean and standard deviation to detect outliers.\n\nimport scipy\nimport numpy as np\narr = df.ANNUAL.to_numpy()\narr = arr[~np.isnan(arr)]\nscipy.stats.shapiro(arr)\n# small p-value --&gt; data is normal\n\nShapiroResult(statistic=0.9584614634513855, pvalue=0.0013542578089982271)\n\n\nBecause the p-value is very small, we can deduce that the data is normally distributed. Thus, we can say that outliers lie 3.5 standard deviations above and below the mean of the distribution."
+  },
+  {
+    "objectID": "posts/outlierdetection/outlier_detection-checkpoint.html#plotting-the-kernel-denstiy-estimation",
+    "href": "posts/outlierdetection/outlier_detection-checkpoint.html#plotting-the-kernel-denstiy-estimation",
+    "title": "Outlier Detection on Annual Rainfall in Coastal Karnataka",
+    "section": "Plotting the Kernel Denstiy Estimation",
+    "text": "Plotting the Kernel Denstiy Estimation\nThe Kernel Density Estimation of the data helps us visualize the shape of the data in a smooth curve.\n\nplt = df.ANNUAL.plot.kde()\nmean = df.ANNUAL.mean()\nstd = df.ANNUAL.std()\n\n# marking outliers\nplt.vlines(x = std*3.5 + mean, ymin = -0.00005, ymax = 0.0008,\n           colors = 'orange',\n           label = 'vline_multiple - full height')\nplt.vlines(x = mean - std*3.5, ymin = -0.00005, ymax = 0.0008,\n           colors = 'orange',\n           label = 'vline_multiple - full height')\n\n&lt;matplotlib.collections.LineCollection at 0x1fe5c87e198&gt;"
+  },
+  {
+    "objectID": "posts/outlierdetection/outlier_detection-checkpoint.html#detecting-outliers-using-isolation-forest",
+    "href": "posts/outlierdetection/outlier_detection-checkpoint.html#detecting-outliers-using-isolation-forest",
+    "title": "Outlier Detection on Annual Rainfall in Coastal Karnataka",
+    "section": "Detecting Outliers using Isolation Forest",
+    "text": "Detecting Outliers using Isolation Forest\nThe Isolation Forest algorithm isolates anomalies by randomly selecting a feature and then randomly selecting a split value between the maximum and minimum values of the selected feature. Outliers are expected to have shorter paths in the tree structure, making them easier to isolate\n\nimport pandas as pd\nfrom sklearn.ensemble import IsolationForest\nimport matplotlib.pyplot as plt\n\n# If the dataset has multiple columns for different years, use the following lines to reshape it\n# df_melted = df.melt(id_vars=['SomeIDColumn'], var_name='Year', value_name='Rainfall')\n# df_melted = df_melted.dropna()  # Remove any NaN values\n# column_to_use = 'Rainfall'  # This is the column with rainfall data\n\ndf = df.dropna(subset=['ANNUAL'])\n\n# If there's a single column for rainfall, directly use it\ncolumn_to_use = 'ANNUAL'  # Replace with your actual column name\n\n# Creating an instance of Isolation Forest\niso_forest = IsolationForest(n_estimators=100, contamination='auto', random_state=42)\n\n# Fitting the model on the Rainfall column\niso_forest.fit(df[[column_to_use]])\n\n# Predicting outliers\noutliers = iso_forest.predict(df[[column_to_use]])\n\n# Adding a column to the DataFrame to indicate outliers\ndf['outlier'] = outliers\n\n# Plotting the results\nplt.figure(figsize=(10, 6))\nplt.scatter(df['YEAR'], df[column_to_use], c=df['outlier'], cmap='coolwarm')  # Replace 'Year' if needed\nplt.title('Outlier Detection in Annual Rainfall')\nplt.xlabel('Year')\nplt.ylabel('Rainfall')\nplt.show()\n\n\n\n\nThe points marked in blue are outliers according to the Isolation Forest. The blue points help us visualize years with unusual rainfall patterns. This could be due to extreme weather events such as droughts or floods."
+  },
+  {
+    "objectID": "posts/classification/classification.html",
+    "href": "posts/classification/classification.html",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "",
+    "text": "import sys\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nassert sys.version_info &gt;= (3, 7)\nfrom packaging import version\nimport sklearn\n\nassert version.parse(sklearn.__version__) &gt;= version.parse(\"1.0.1\")\nFirst we read the input data. The data contains two columns: Text and Language\nfrom sklearn.datasets import fetch_openml\n\ndf = pd.read_csv(\"./Language Detection-checkpoint.csv\")\nprint(df.keys())\ndf['Text']\n\nIndex(['Text', 'Language'], dtype='object')\n\n\n0         Nature, in the broadest sense, is the natural...\n1        \"Nature\" can refer to the phenomena of the phy...\n2        The study of nature is a large, if not the onl...\n3        Although humans are part of nature, human acti...\n4        [1] The word nature is borrowed from the Old F...\n                               ...                        \n10332    ನಿಮ್ಮ ತಪ್ಪು ಏನು ಬಂದಿದೆಯೆಂದರೆ ಆ ದಿನದಿಂದ ನಿಮಗೆ ಒ...\n10333    ನಾರ್ಸಿಸಾ ತಾನು ಮೊದಲಿಗೆ ಹೆಣಗಾಡುತ್ತಿದ್ದ ಮಾರ್ಗಗಳನ್...\n10334    ಹೇಗೆ ' ನಾರ್ಸಿಸಿಸಮ್ ಈಗ ಮರಿಯನ್ ಅವರಿಗೆ ಸಂಭವಿಸಿದ ಎ...\n10335    ಅವಳು ಈಗ ಹೆಚ್ಚು ಚಿನ್ನದ ಬ್ರೆಡ್ ಬಯಸುವುದಿಲ್ಲ ಎಂದು ...\n10336    ಟೆರ್ರಿ ನೀವು ನಿಜವಾಗಿಯೂ ಆ ದೇವದೂತನಂತೆ ಸ್ವಲ್ಪ ಕಾಣು...\nName: Text, Length: 10337, dtype: object"
+  },
+  {
+    "objectID": "posts/classification/classification.html#plot-languages-against-the-number-of-texts-in-that-language",
+    "href": "posts/classification/classification.html#plot-languages-against-the-number-of-texts-in-that-language",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Plot languages against the number of texts in that language",
+    "text": "Plot languages against the number of texts in that language\n\nplt.rc('font', size=14)\nplt.rc('axes', labelsize=14, titlesize=14)\nplt.rc('legend', fontsize=14)\nplt.rc('xtick', labelsize=10)\nplt.rc('ytick', labelsize=10)\n\nplt.bar(x=df['Language'].value_counts().index, height=df['Language'].value_counts())\nplt.xlabel('Language')\nplt.ylabel('Number of Texts')\nplt.xticks(rotation=90)\nplt.show()"
+  },
+  {
+    "objectID": "posts/classification/classification.html#preprocess-the-data",
+    "href": "posts/classification/classification.html#preprocess-the-data",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Preprocess the Data",
+    "text": "Preprocess the Data\nMake sure the texts only contain alphabetical characters\n\n# Text data preprocessing\n# Uniform case, remove symbols and whitespace\ndf['Text'] = df['Text'].str.lower()\ndf['Text'] = df['Text'].str.replace(r'[\\([{})\\]!@#$,\"%^*?:;~`0-9]', '', regex=True)\ndf['Text'] = df['Text'].str.strip()"
+  },
+  {
+    "objectID": "posts/classification/classification.html#using-tf-idf-term-frequency-inverse-document-frequency",
+    "href": "posts/classification/classification.html#using-tf-idf-term-frequency-inverse-document-frequency",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Using TF-IDF: Term Frequency Inverse Document Frequency",
+    "text": "Using TF-IDF: Term Frequency Inverse Document Frequency\nWe use TF-IDF to transform text into numeric data. This measures the originality of a word by comparing the number of times a particular word appears in a text versus the number of texts that word appears in\n\n# The TF-IDF vectorizer initializing \nfrom sklearn.feature_extraction.text import TfidfVectorizer\ntfidf_vectorizer = TfidfVectorizer()\ntfidf_vectorizer.fit(df['Text'])\nX_tfidf = tfidf_vectorizer.transform(df['Text'])\n\nWe use a Label Encoder to convert each language name to a number.\n\n# Encoding the target labels (languages)\nfrom sklearn.preprocessing import LabelEncoder\nlabel_encoder = LabelEncoder()\ny_encoded = label_encoder.fit_transform(df['Language'])"
+  },
+  {
+    "objectID": "posts/classification/classification.html#split-the-data-into-testing-and-training-sets",
+    "href": "posts/classification/classification.html#split-the-data-into-testing-and-training-sets",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Split the data into testing and training sets",
+    "text": "Split the data into testing and training sets\n\nX_train, X_test, y_train, y_test = X_tfidf[:5000], X_tfidf[5000:], y_encoded[:5000], y_encoded[5000:]\n#X_train, X_test, y_train, y_test = X_tfidf[:5000], X_tfidf[5000:10000], y_num[:5000], y_num[5000:10000]\nX_train_english = (X_train == 1) # True for all English texts, English = 1\n\nprint(y_encoded)\n\n[3 3 3 ... 9 9 9]"
+  },
+  {
+    "objectID": "posts/classification/classification.html#use-sgd-stochastic-gradient-descent-to-classify-and-make-predictions",
+    "href": "posts/classification/classification.html#use-sgd-stochastic-gradient-descent-to-classify-and-make-predictions",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Use SGD (Stochastic Gradient Descent) to classify and make predictions",
+    "text": "Use SGD (Stochastic Gradient Descent) to classify and make predictions\n\n# Training binary classifier\nfrom sklearn.linear_model import SGDClassifier\nimport numpy as np\n\nsgd_clf = SGDClassifier(random_state=42)\nsgd_clf.fit(X_train, y_train)\n\nSGDClassifier(random_state=42)"
+  },
+  {
+    "objectID": "posts/classification/classification.html#prediction-function",
+    "href": "posts/classification/classification.html#prediction-function",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Prediction Function",
+    "text": "Prediction Function\nThis prediction function takes a text as input, and outputs the predicted language that the text is written in.\n\n# predict languge given text \ndef predict_language(input_text):\n    input_text = input_text.lower() # preprocess input text\n    input_tfidf = tfidf_vectorizer.transform([input_text]) # convert input to numeric data\n    predicted = sgd_clf.predict(input_tfidf) # get encoded prediction\n    predicted_language = label_encoder.inverse_transform(predicted) # decode prediction\n    return predicted_language\n\n#predict_language(X[1400])"
+  },
+  {
+    "objectID": "posts/classification/classification.html#data-visualization",
+    "href": "posts/classification/classification.html#data-visualization",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Data Visualization",
+    "text": "Data Visualization\nCreating a confusion matrix to illustrate the predictions made by the classifier.\n\nfrom sklearn.metrics import confusion_matrix\nfrom sklearn.preprocessing import LabelEncoder\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Fit the label encoder on all possible labels\nlabel_encoder = LabelEncoder()\nlabel_encoder.fit(df['Language'])  # Fit on the entire label set\n\n# Now transform the test labels\nLanguage_test_encoded = label_encoder.transform(df['Language'][5000:])\n\nText_test = df['Text'][5000:]\npredicted_languages = [predict_language(text) for text in Text_test]\n\n# Transform the predicted languages back to the encoded form\npredicted_languages_encoded = label_encoder.transform(predicted_languages)\n\n# Comparing the predicted languages with the actual labels\nresults_df = pd.DataFrame({'Actual': Language_test_encoded, 'Predicted': predicted_languages_encoded})\n\n# Construct the confusion matrix manually\nconf_matrix = confusion_matrix(results_df['Actual'], results_df['Predicted'])\n# Get all unique labels present in the actual and predicted labels\nall_labels = np.union1d(results_df['Actual'], results_df['Predicted'])\n\n# Convert to DataFrame for easier plotting\n# Use all_labels for both the index and columns to account for every possible class\nconf_matrix_df = pd.DataFrame(conf_matrix, \n                              index=all_labels, \n                              columns=all_labels)\n\n# Plot the confusion matrix\nplt.figure(figsize=(10, 8))\nsns.heatmap(conf_matrix_df, annot=True, fmt='d', square=True)\nplt.title('Confusion Matrix of Language Predictions')\nplt.xlabel('Predicted')\nplt.ylabel('Actual')\nplt.show()\n\n# Calculate accuracy\naccuracy = (results_df['Actual'] == results_df['Predicted']).mean()\nprint(f'Accuracy of the predict_language function: {accuracy:.2f}')\n\nC:\\Users\\veda\\AppData\\Local\\Programs\\Python\\Python37\\lib\\site-packages\\sklearn\\preprocessing\\_label.py:133: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().\n  y = column_or_1d(y, warn=True)\n\n\n\n\n\nAccuracy of the predict_language function: 0.07"
+  },
+  {
+    "objectID": "posts/classification/classification.html#interpretation",
+    "href": "posts/classification/classification.html#interpretation",
+    "title": "Classification - Classifying Texts in Different Languages",
+    "section": "Interpretation",
+    "text": "Interpretation\nFrom the confusion matrix, we can see that the model is very good at predicting some languages (like the one labeled ‘8’, with 341 correct predictions). Some languages are often confused with others, such as labels ‘5’, ‘6’, ‘9’, and ‘12’, indicating potential areas for model improvement. The accuracy of this model could potentially be improved by using more training data and by trying different algorithms."
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blogs",
+    "section": "",
+    "text": "Classification - Classifying Texts in Different Languages\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nClustering - Finding Clusters in Earthquake data\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nOutlier Detection on Annual Rainfall in Coastal Karnataka\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nProbability Theory - Sentiment Analysis with Naive Bayes\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nRegression - Height and Weight data for 18 year olds\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "CS 5805 Blogs - Veda Hegde",
+    "section": "",
+    "text": "All blogs can be found by clicking ‘Blog’"
+  },
+  {
+    "objectID": "posts/clustering/clustering-checkpoint.html",
+    "href": "posts/clustering/clustering-checkpoint.html",
+    "title": "Clustering - Finding Clusters in Earthquake data",
+    "section": "",
+    "text": "Dataset - Depth vs Magnitude of earthquakes that have occurred\nPlot original data on a scatterplot\nUse KMeans for clustering - 3 clusters\nPlot clusters and cluster centers\nimport sys\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\nassert sys.version_info &gt;= (3, 7)\nfrom packaging import version\nimport sklearn\n\nassert version.parse(sklearn.__version__) &gt;= version.parse(\"1.0.1\")\nFirst we will read the earthquake data. The goal is to find clusters correlating earthquake depth to earthquake magnitude.\ndf = pd.read_csv(\"./earthquake_data-checkpoint.csv\")\nX = df['depth'][0:200]\ny = df['magnitude'][0:200]"
+  },
+  {
+    "objectID": "posts/clustering/clustering-checkpoint.html#plot-the-original-data-on-a-scatterplot",
+    "href": "posts/clustering/clustering-checkpoint.html#plot-the-original-data-on-a-scatterplot",
+    "title": "Clustering - Finding Clusters in Earthquake data",
+    "section": "Plot the original data on a scatterplot",
+    "text": "Plot the original data on a scatterplot\n\nimport matplotlib.pyplot as plt\n\nplt.rc('font', size=14)\nplt.rc('axes', labelsize=14, titlesize=14)\nplt.rc('legend', fontsize=14)\nplt.rc('xtick', labelsize=10)\nplt.rc('ytick', labelsize=10)\nplt.figure(figsize=(10, 4))\n\nX = df['depth'][0:200]\ny = df['magnitude'][0:200]\nplt.scatter(X, y, marker='*')\nplt.xlabel(\"$depth$\")\nplt.ylabel(\"$magnitude$\", rotation=90)\n#plt.axis([90, 160, 60, 75])\nplt.grid()\nplt.show()\n\n\n\n\nNow we will run the KMeans algorithm to yield 2 clusters. The algorithm will run 10 times. We are running the algorithm on the first 500 data points in the set.\n\nClustering Based on Magnitude and Depth\nBy applying KMeans clustering to the magnitude and depth of earthquakes, we can identify distinct categories of earthquakes. These categories might reveal patterns such as typical depth ranges for different magnitudes and help in understanding the nature of seismic activities.\n\n\nInterpreting Cluster Results\nThe results from clustering will provide insights into the distribution and characteristics of earthquake events. For instance, clusters might indicate areas prone to high-magnitude earthquakes or regions with frequent but shallow seismic activities. This analysis is essential for disaster preparedness and mitigation strategies.\n\nfrom sklearn.cluster import KMeans\nimport numpy as np\n\nk_means = KMeans(init=\"k-means++\", n_clusters=2, n_init=10)\n#X = [df['depth'][0:200], df['magnitude'][0:200]]\nX = []\nfor i in range(500):\n    X.append([df['depth'][i], df['magnitude'][i]])\nk_means.fit(X)\n\nKMeans(n_clusters=2)\n\n\nAfter running the algorithm, we can obtain the cluster centers that were found.\n\nfrom sklearn.metrics.pairwise import pairwise_distances_argmin\n\nk_means_cluster_centers = k_means.cluster_centers_\nk_means_labels = pairwise_distances_argmin(X, k_means_cluster_centers)"
+  },
+  {
+    "objectID": "posts/clustering/clustering-checkpoint.html#kmeans-clustering-results",
+    "href": "posts/clustering/clustering-checkpoint.html#kmeans-clustering-results",
+    "title": "Clustering - Finding Clusters in Earthquake data",
+    "section": "KMeans Clustering Results",
+    "text": "KMeans Clustering Results\nIn each iteration of the KMeans algorithm, the centroids of the clusters are adjusted to minimize the variance within each cluster. The following plots show how the cluster centroids and the assignment of points to clusters change with each iteration.\n\nInitial Iteration\nIn the initial iteration, the centroids are randomly placed. The points are assigned to the nearest centroid, forming the initial clusters.\n\n\nSubsequent Iterations\nIn each subsequent iteration, the centroids are recalculated as the mean of the points in each cluster. The points are then reassigned to the closest new centroid. This process continues until the centroids stabilize and no longer change significantly.\n\n\nFinal Clusters\nAfter a number of iterations, the centroids converge to a position where they best represent the centers of the clusters. The final plot shows the stable clusters where each point is grouped with similar points, minimizing the variance within each cluster.\n\nfrom sklearn.cluster import KMeans\nimport numpy as np\nimport matplotlib.pyplot as plt\n\nX = np.array(X)\n\n# Number of clusters\nnum_clusters = 3  # Example number of clusters\n\n# Create KMeans instance\nkmeans = KMeans(n_clusters=num_clusters, random_state=42)\n\n# Number of iterations for demonstration\nnum_iterations = 5\n\n# Plotting the clusters for each iteration\nfor i in range(num_iterations):\n    # Run KMeans for a number of iterations\n    kmeans.n_init = i + 1\n    kmeans.fit(X)\n    \n    # Plotting the data and centroids\n    plt.figure(figsize=(8, 6))\n    plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='viridis')\n    plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', label='Centroids')\n    plt.title(f'Clusters after {i + 1} iterations')\n    plt.xlabel('Depth (km)')\n    plt.ylabel('Magnitude')\n    plt.legend()\n    plt.show()"
+  },
+  {
+    "objectID": "posts/clustering/clustering-checkpoint.html#interpretation",
+    "href": "posts/clustering/clustering-checkpoint.html#interpretation",
+    "title": "Clustering - Finding Clusters in Earthquake data",
+    "section": "Interpretation",
+    "text": "Interpretation\nThe final clusters show three distinct groups of earthquakes. There is a noticeable cluster of earthquakes with a smaller depth range but higher magnitudes, possibly indicating a pattern of seismic activity that could be of interest for further investigation."
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "",
+    "text": "Performing sentiment analysis on Twitter tweets using the Naive Bayes algorithm.\nimport pandas as pd\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.naive_bayes import MultinomialNB\nfrom sklearn.pipeline import make_pipeline\nfrom sklearn.metrics import classification_report"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#loading-and-preprocessing-the-data",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#loading-and-preprocessing-the-data",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Loading and Preprocessing the Data",
+    "text": "Loading and Preprocessing the Data\nFirst, we load the data and explore its structure.\n\n# Load the dataset\ndata = pd.read_csv('./twitter_training.csv' )\n\n# Display the first few rows of the dataset\ndata.head()\n\n\n\n\n\n\n\n\nTopic\nSentiment\nText\n\n\n\n\n0\nBorderlands\nPositive\nim getting on borderlands and i will murder yo...\n\n\n1\nBorderlands\nPositive\nI am coming to the borders and I will kill you...\n\n\n2\nBorderlands\nPositive\nim getting on borderlands and i will kill you ...\n\n\n3\nBorderlands\nPositive\nim coming on borderlands and i will murder you...\n\n\n4\nBorderlands\nPositive\nim getting on borderlands 2 and i will murder ...\n\n\n\n\n\n\n\nNext, we preprocess the data by removing rows with missing text values.\n\n# Remove rows with missing values in the 'text' column\ncleaned_data = data.dropna(subset=['Text'])"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#preparing-the-data-for-modeling",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#preparing-the-data-for-modeling",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Preparing the Data for Modeling",
+    "text": "Preparing the Data for Modeling\nWe split the data into training and testing sets.\n\n# Splitting the dataset into training and testing sets\nX_train, X_test, y_train, y_test = train_test_split(cleaned_data['Text'], cleaned_data['Sentiment'], test_size=0.2, random_state=42)"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#building-and-training-the-naive-bayes-model",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#building-and-training-the-naive-bayes-model",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Building and Training the Naive Bayes Model",
+    "text": "Building and Training the Naive Bayes Model\nWe use a pipeline to vectorize the text and train the model.\n\n# Preprocessing and vectorization using a pipeline\nmodel = make_pipeline(\n    TfidfVectorizer(),\n    MultinomialNB()\n)\n\n# Training the model\nmodel.fit(X_train, y_train)\n\nPipeline(steps=[('tfidfvectorizer', TfidfVectorizer()),\n                ('multinomialnb', MultinomialNB())])"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#evaluating-the-model",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#evaluating-the-model",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Evaluating the Model",
+    "text": "Evaluating the Model\nFinally, we evaluate the model’s performance on the test set.\n\n# Evaluating the model\npredictions = model.predict(X_test)\nreport = classification_report(y_test, predictions)\nprint(report)\n\n              precision    recall  f1-score   support\n\n  Irrelevant       0.95      0.38      0.55      2696\n    Negative       0.63      0.91      0.75      4380\n     Neutral       0.85      0.60      0.70      3605\n    Positive       0.69      0.82      0.75      4119\n\n    accuracy                           0.71     14800\n   macro avg       0.78      0.68      0.69     14800\nweighted avg       0.76      0.71      0.70     14800"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#testing-the-model-with-new-data-and-visualization",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#testing-the-model-with-new-data-and-visualization",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Testing the Model with New Data and Visualization",
+    "text": "Testing the Model with New Data and Visualization\nNow, we will test the model with new data and visualize the accuracy of the model.\n\n# Example new data to test\nnew_data = [\"This movie was fantastic, I loved it!\",\n            \"The movie was okay, but I think the ending could be better\",\n            \"I did not like the movie, it was boring and too long\"]\n\n# Predicting the sentiment of the new data\nnew_predictions = model.predict(X_test)\nprint(X_test)\nnew_predictions\n\n61413    Looks to me like he failed to check out the wa...\n44887    Wow, it takes all sorts of crazy people out th...\n73662    Nvidia Unveils The World’s Fastest Gaming Moni...\n36694    Huge radio play here. Reinvention / Corporate ...\n2308                            SO I HAPPY WHO ABOUT THIS.\n                               ...                        \n12630    @Ronnie2K where is all my Mamba Edition extras...\n49615               Sell 700k fifa coins fucking this game\n12322    @NBA2K $ 107 for a four game break and I can't...\n4355     has called me a madman.. I understood right fr...\n52612       RDR2 at 31m makes really this boy super happy.\nName: Text, Length: 14800, dtype: object\n\n\narray(['Negative', 'Positive', 'Neutral', ..., 'Negative', 'Irrelevant',\n       'Positive'], dtype='&lt;U10')"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#data-visualization",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#data-visualization",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Data Visualization",
+    "text": "Data Visualization\nCreating a confusion matrix to illustrate the predictions made by the classifier on the test sets.\n\nimport matplotlib.pyplot as plt\nfrom sklearn.metrics import accuracy_score, confusion_matrix\nimport seaborn as sns\n\nnew_data_actual_labels = y_test\n\n# Calculating accuracy\naccuracy = accuracy_score(new_data_actual_labels, new_predictions)\n\n# Creating a confusion matrix\nconf_matrix = confusion_matrix(new_data_actual_labels, new_predictions)\n\n# Plotting the confusion matrix\nsns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')\nplt.title(f'Model Accuracy: {accuracy:.2f}')\nplt.xlabel('Predicted labels')\nplt.ylabel('True labels')\nplt.show()"
+  },
+  {
+    "objectID": "posts/probabilitytheory/probability_theory-checkpoint.html#interpretation",
+    "href": "posts/probabilitytheory/probability_theory-checkpoint.html#interpretation",
+    "title": "Probability Theory - Sentiment Analysis with Naive Bayes",
+    "section": "Interpretation",
+    "text": "Interpretation\nThe four labels represent four sentiments: Positive, Negative, Neutral, and Irrelevant The diagonal entries in the matrix tell us how many predictions for each class were correct: the model correctly predicted class 0 for 1037 instances, class 1 for 3985 instances, class 2 for 2174 instances, and class 3 for 3370 instances. All of the off-diagonal entries represent misclassifications.\nOverall, the model is most accurate with classes 1 and 3, where the diagonal values are high relative to the off-diagonal values. The model seems to struggle the most with accurately classifying class 2."
+  }
+]
